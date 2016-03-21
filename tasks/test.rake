@@ -15,10 +15,8 @@ module Nose
   # Returns boolean indicating success or failure.
   #
   def self.nosetests(test_dir, args="")
-    unit_test_vars = "BOTO_CONFIG=test/helpers/aws.config AWS_CONFIG_FILE=test/helpers/aws.config " +
-        "AWS_PROFILE=unit_tests "  # use invalid AWS credentials so that actual AWS API calls fail
-    unit_test_vars += "ASIAQ_CONFIG=sample_configuration "  # make sure we use our config for portability
-    unit_test_params = "--processes=-1 --process-timeout=300 "  # run tests in parallel
+    unit_test_vars = ""
+    unit_test_params = ""
     #
     # Why three --where arguments?
     #

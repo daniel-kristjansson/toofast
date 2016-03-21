@@ -43,8 +43,7 @@ def main():
     logging.getLogger('').setLevel(logging.DEBUG)
 
     data = read_data_directory("sample_data")
-    buckets = bucket_data(
-        data, datetime.timedelta(minutes=15).seconds, ignore_date=True)
+    buckets = bucket_data(data, datetime.timedelta(minutes=15).seconds)
     stats = compute_statistics(buckets)
     grouped_stats = group_statistics(stats)
     output_csv(sys.stdout, grouped_stats)
