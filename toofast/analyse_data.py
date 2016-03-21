@@ -1,6 +1,8 @@
 """
 Analyse our speeding data
 """
+
+
 def bucket_data(data, block_duration, ignore_date=False):
     '''Buckets our data by time of day'''
     timekey = "timeofday" if ignore_date else "datetime"
@@ -19,6 +21,7 @@ def bucket_data(data, block_duration, ignore_date=False):
         my_datetime = end_datetime
 
     return buckets
+
 
 def compute_statistics(buckets):
     '''Computes all the statistics we might want to know about a time series'''
@@ -42,6 +45,7 @@ def compute_statistics(buckets):
             "50%": float(speeds[int(len(speeds) * 0.50)]),
         }
     return stats
+
 
 def group_statistics(stats):
     '''TBD'''

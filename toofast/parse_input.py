@@ -7,6 +7,7 @@ import timestring
 from constants import (
     FILE_HEADERS, VEHICLE_HEADERS, MINIMUM_SPEED, MAXIMUM_SPEED)
 
+
 def extract_file_header(row):
     '''
     Extracts a single header line from our wacky CSV file format.
@@ -27,6 +28,7 @@ def extract_file_header(row):
                 return {header: row[idx+1]}
     return {}
 
+
 def read_file_header(filename, csv_reader):
     '''
     Returns all the file headers in FILE_HEADER + the filename as dictionary entries
@@ -41,12 +43,14 @@ def read_file_header(filename, csv_reader):
             return header_data
     raise Exception("Unable to parse header for file {}".format(filename))
 
+
 def is_null_vehicle(cur):
     '''Returns True if and only if we've seen a header or a empty vehicle entry'''
     for key, value in cur.iteritems():
         if not value or value.lower() == key:
             return True
     return False
+
 
 def is_valid_vehicle(cur):
     '''Returns True if and only if we should treat this as a valid entry'''
@@ -59,6 +63,7 @@ def is_valid_vehicle(cur):
     if float(cur.get("speed")) < MINIMUM_SPEED or float(cur.get("speed")) > MAXIMUM_SPEED:
         return False
     return True
+
 
 def extract_data_row(file_header, header_info, row, line_num):
     '''
@@ -90,6 +95,7 @@ def extract_data_row(file_header, header_info, row, line_num):
             cur = {}
     return data
 
+
 def extract_header_info(row):
     '''
     Returns a header_dictionary for use by the extract_data_row function.
@@ -100,6 +106,7 @@ def extract_header_info(row):
     '''
     return {idx: header for header in VEHICLE_HEADERS for idx in xrange(len(row))
             if row[idx] and header == row[idx][0:len(header)].lower()}
+
 
 def read_vehicle_data(file_header, csv_reader):
     '''Reads the vehicle data in a CSV file'''
@@ -116,6 +123,7 @@ def read_vehicle_data(file_header, csv_reader):
             header_info = extract_header_info(row)
     return data
 
+
 def read_data_file(filename):
     '''Open a single CSV file and reads the data in the file'''
     with open(filename, 'rb') as speed_file:
@@ -123,6 +131,7 @@ def read_data_file(filename):
         header = read_file_header(filename, speed_reader)
         data = read_vehicle_data(header, speed_reader)
         return data
+
 
 def read_data_directory(data_dir):
     '''Reads the CSV data in all the files in a directory'''
@@ -135,4 +144,3 @@ def read_data_directory(data_dir):
             logging.exception("Exception reading %s", full_filename)
             raise
     return data
-

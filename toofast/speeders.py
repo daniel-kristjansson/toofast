@@ -37,6 +37,7 @@ from output_statistics import output_csv
 from analyse_data import (
     bucket_data, compute_statistics, group_statistics)
 
+
 def main():
     '''Reads a directory of speed data and outputs relevant statistics'''
     logging.getLogger('').setLevel(logging.DEBUG)
@@ -47,6 +48,7 @@ def main():
     stats = compute_statistics(buckets)
     grouped_stats = group_statistics(stats)
     output_csv(sys.stdout, grouped_stats)
+
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,7 @@
 '''Output our statistics'''
 import csv
 
+
 def output_csv(output_file, stats):
     '''Writes statistics to an output CSV file'''
     rows = sorted(stats.keys())
@@ -15,4 +16,3 @@ def output_csv(output_file, stats):
         values = [stats[row][key] for key in stats_keys]
         when = ["{}:{}:{}".format(row.hour, row.minute, row.second)]
         writer.writerow(when + values)
-
