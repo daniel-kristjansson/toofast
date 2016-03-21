@@ -2,15 +2,22 @@
 Analyse our speeding data
 """
 import math
+import timestring
+
+
+def datetime_range(datetimes, block_duration):
+    '''Finds minumum and maximum times from a list'''
+    min_datetime = min(datetimes) + 0  # forces copy
+    min_datetime.minute = 0
+    max_datetime = max(datetimes) + block_duration
+    return (min_datetime, max_datetime)
 
 
 def bucket_data(data, block_duration):
     '''Buckets our data by time of day'''
     timekey = "datetime"
-    datetimes = [val[timekey] for val in data]
-    min_datetime = min(datetimes) + 0  # forces copy
-    min_datetime.minute = 0
-    max_datetime = max(datetimes) + block_duration
+    min_datetime, max_datetime = datetime_range(
+        [val[timekey] for val in data], block_duration)
     my_datetime = min_datetime
     buckets = []
     while my_datetime < max_datetime:
@@ -49,6 +56,37 @@ def compute_statistics(buckets):
     return stats
 
 
+def combine_stats(stats):
+    '''Given a list of stats compute combined statistics'''
+    count = sum([stat["count"] for stat in stats])
+    count_legal = sum([stat["count_legal"] for stat in stats])
+    inv_stat_cnt = 1.0 / len(stats)
+    min_spd = min([stat["min"] for stat in stats])
+    max_spd = max([stat["max"] for stat in stats])
+    return {
+        "limit": stats[0]["limit"],
+        "count_legal": count_legal,
+        "count": count,
+        "%legal": count_legal * 100.0 / count,
+        "min": min_spd,
+        "max": max_spd,
+        "85%": sum([stat["85%"] for stat in stats]) * inv_stat_cnt,
+        "99%": sum([stat["99%"] for stat in stats]) * inv_stat_cnt,
+        "diff": max_spd - min_spd,
+        "mean": sum([stat["mean"] for stat in stats]) * inv_stat_cnt,
+        "50%": sum([stat["50%"] for stat in stats]) * inv_stat_cnt
+    }
+
 def group_statistics(stats):
-    '''TBD'''
-    return stats
+    '''Group our statistics by time of day'''
+    # remap stats by time of day tuple (hour,minute)
+    tod_stat = {}
+    for when, stat in stats.iteritems():
+        tod = (when.hour, when.minute)
+        if tod_stat.get(tod):
+            tod_stat[tod].append(stat)
+        else:
+            tod_stat[tod] = [stat]
+    return {
+        str("{:02}:{:02}:00".format(when[0], when[1])):
+        combine_stats(group_stats) for when, group_stats in tod_stat.iteritems()}

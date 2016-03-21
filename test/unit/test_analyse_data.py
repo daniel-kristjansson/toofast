@@ -66,4 +66,19 @@ class AnalyseDataTests(TestCase):
         self.assertIsNone(stats.get("5"))
 
     def test_group_statistics(self):
-        group_statistics(None)
+        buckets = [
+            {"data": [mock_vehicle(20), mock_vehicle(20)], "name": timestring.Date("2016-01-01 05:00:00")},
+            {"data": [mock_vehicle(20), mock_vehicle(20)], "name": timestring.Date("2016-01-01 05:15:00")},
+            {"data": [mock_vehicle(30), mock_vehicle(30)], "name": timestring.Date("2016-01-02 05:00:00")},
+            {"data": [mock_vehicle(25), mock_vehicle(25)], "name": timestring.Date("2016-01-01 05:15:00")}]
+        stats = compute_statistics(buckets)
+        gstats = group_statistics(stats)
+        period1 = gstats["05:00:00"]
+        self.assertAlmostEqual(period1["max"], 30.0)
+        self.assertAlmostEqual(period1["min"], 20.0)
+        self.assertAlmostEqual(period1["count_legal"], 2)
+        self.assertAlmostEqual(period1["diff"], 10.0)
+        self.assertAlmostEqual(period1["mean"], 25.0)
+        self.assertAlmostEqual(period1["count"], 4)
+        self.assertAlmostEqual(period1["limit"], 25)
+
