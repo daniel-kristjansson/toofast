@@ -14,5 +14,5 @@ def output_csv(output_file, stats):
 
     for row in rows:
         values = [stats[row][key] for key in stats_keys]
-        when = ["{}:{}:{}".format(row.hour, row.minute, row.second)]
+        when = ["{:02}:{:02}:{:02}".format(row.hour, row.minute, row.second)]
         writer.writerow(when + values)
