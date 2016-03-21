@@ -125,7 +125,7 @@ def read_vehicle_data(file_header, csv_reader):
     return data
 
 
-def read_data_file(filename):
+def read_data_file(filename):  # pragma: no cover
     '''Open a single CSV file and reads the data in the file'''
     with open(filename, 'rb') as speed_file:
         speed_reader = csv.reader(speed_file)
@@ -134,7 +134,7 @@ def read_data_file(filename):
         return data
 
 
-def read_data_directory(data_dir):
+def read_data_directory(data_dir):  # pragma: no cover
     '''Reads the CSV data in all the files in a directory'''
     data = []
     for filename in os.listdir(data_dir):
