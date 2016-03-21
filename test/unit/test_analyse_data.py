@@ -7,7 +7,7 @@ from toofast.analyse_data import (
 
 
 def mock_vehicle(speed, datetime=None):
-    return {"speed limit": "25", "speed": str(speed), "datetime": datetime }
+    return {"speed limit": "25", "speed": str(speed), "datetime": datetime}
 
 
 class AnalyseDataTests(TestCase):
@@ -32,7 +32,6 @@ class AnalyseDataTests(TestCase):
         bucket_a = [b for b in buckets if b["name"] == timestring.Date("2016-01-01 05:00:00")][0]
         self.assertEqual(len(bucket_a["data"]), 4)
         self.assertEqual([val["speed"] for val in bucket_a["data"]], ["20", "20", "20", "20"])
-
 
     def test_compute_statistics(self):
         buckets = [
@@ -60,9 +59,9 @@ class AnalyseDataTests(TestCase):
         self.assertAlmostEqual(stats["2"]["mean"], 30.0)
         self.assertAlmostEqual(stats["3"]["mean"], 20.0)
         self.assertAlmostEqual(stats["1"]["count"], 2)
-        self.assertAlmostEqual(stats["4"]["85%"], 28.0)
-        self.assertAlmostEqual(stats["4"]["99%"], 29.0)
-        self.assertAlmostEqual(stats["4"]["50%"], 25.0)
+        self.assertAlmostEqual(stats["4"]["85%"], 27.0)
+        self.assertAlmostEqual(stats["4"]["99%"], 28.0)
+        self.assertAlmostEqual(stats["4"]["50%"], 24.0)
         self.assertAlmostEqual(stats["4"]["limit"], 25.0)
         self.assertIsNone(stats.get("5"))
 

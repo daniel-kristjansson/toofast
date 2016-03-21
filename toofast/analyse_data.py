@@ -32,6 +32,7 @@ def compute_statistics(buckets):
         if not speeds:
             continue
         speed_limit = float(bucket["data"][0]["speed limit"])
+        max_speed_index = len(speeds) - 1
         stats[bucket['name']] = {
             "limit": speed_limit,
             "count_legal": len([spd for spd in speeds if spd <= speed_limit]),
@@ -39,11 +40,11 @@ def compute_statistics(buckets):
             "min": float(speeds[0]),
             "max": float(speeds[-1]),
             "count": len(speeds),
-            "85%": float(speeds[int(math.floor(len(speeds) * 0.85))]),
-            "99%": float(speeds[int(math.floor(len(speeds) * 0.99))]),
+            "85%": float(speeds[int(math.floor(max_speed_index * 0.85))]),
+            "99%": float(speeds[int(math.floor(max_speed_index * 0.99))]),
             "diff": float(speeds[-1]) - float(speeds[0]),
             "mean": float(sum(speeds)) / len(speeds),
-            "50%": float(speeds[int(math.floor(len(speeds) * 0.50))]),
+            "50%": float(speeds[int(math.floor(max_speed_index * 0.50))]),
         }
     return stats
 
