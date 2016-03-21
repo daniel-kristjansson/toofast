@@ -40,24 +40,48 @@ FILE_HEADERS = ["name", "date", "location", "direction", "weather", "speed limit
 VEHICLE_HEADERS = ['vehicle', 'time', 'speed']
 
 def extract_file_header(row):
+    '''
+    Extracts a single header line from our wacky CSV file format.
+
+    This matches anything of the form: ^[,*]('name'|'date'|etc)[.*],(.*)[,*]$
+
+    Where the first capture is any of the valid file headers and the second capture is
+    the value that follows. This uses a CSV parser so CSV quoting is allowed even though
+    not reflected in the psudo regular expression above. This is also not case sensitive.
+
+    A dictionary containing the key and the extracted value is returned, or an empty
+    dictionary if no matching key is found.
+
+    '''
     for header in FILE_HEADERS:
         for idx in xrange(len(row)):
             if row[idx] and header == row[idx][0:len(header)].lower():
                 return {header: row[idx+1]}
     return {}
 
-def read_file_header(csv_reader):
+def read_file_header(filename, csv_reader):
+    '''
+    Returns all the file headers in FILE_HEADER + the filename as dictionary entries
+
+    An exception is raised if all file headers are not found.
+    '''
     header_data = {}
     for row in csv_reader:
         header_data.update(extract_file_header(row))
         if len(header_data) == len(FILE_HEADERS):
+            header_data["filename"] = filename
             return header_data
-    raise Exception("Unable to parse header")
+    raise Exception("Unable to parse header for file {}".format(filename))
+
+def is_null_vehicle(cur):
+    for key, value in cur.iteritems():
+        if not value or value.lower() == key:
+            return True
+    return False
 
 def is_valid_vehicle(cur):
-    for value in cur.values():
-        if not value:
-            return False
+    if is_null_vehicle(cur):
+        return False
     if not cur.get("vehicle", "not integer").isdigit():
         return False
     if not cur.get("speed", "not integer").isdigit():
@@ -66,7 +90,7 @@ def is_valid_vehicle(cur):
         return False
     return True
 
-def extract_data_row(file_header, header_info, row):
+def extract_data_row(file_header, header_info, row, line_num):
     VEHICLE_HEADERS = ['vehicle', 'time', 'speed']
     data = []
     cur = {}
@@ -79,6 +103,9 @@ def extract_data_row(file_header, header_info, row):
                 cur["datetime"] = timestring.Date(file_header['date'] + " " + cur['time'])
                 cur["timeofday"] = timestring.Date("1/1/2016" + " " + cur['time'])
                 data += [cur]
+            elif not is_null_vehicle(cur):
+                logging.info("'{}':{:<4} Invalid vehicle {}".format(
+                    file_header["filename"], line_num, cur))
             cur = {}
     return data
 
@@ -91,7 +118,7 @@ def read_data(file_header, csv_reader):
     data = []
     for row in csv_reader:
         if header_info:
-            row_data = extract_data_row(file_header, header_info, row)
+            row_data = extract_data_row(file_header, header_info, row, csv_reader.line_num)
             if row_data:
                 data += row_data
             elif extract_header_info(row):
@@ -104,7 +131,7 @@ def read_data_file(filename):
     '''Open a single CSV file and reads the data in the file'''
     with open(filename, 'rb') as speed_file:
         speed_reader = csv.reader(speed_file)
-        header = read_file_header(speed_reader)
+        header = read_file_header(filename, speed_reader)
         data = read_data(header, speed_reader)
         return data
 
@@ -177,11 +204,13 @@ def output_statistics(output_file, stats):
 
     for row in rows:
         values = [stats[row][key] for key in stats_keys]
-        when = ["{:02}:{:02}:{:02}".format(row.hour, row.minute, row.second)]
+        when = ["{}:{}:{}".format(row.hour, row.minute, row.second)]
         writer.writerow(when + values)
 
 def main():
     '''Reads a directory of speed data and outputs relevant statistics'''
+    logging.getLogger('').setLevel(logging.DEBUG)
+
     data = read_data_directory("sample_data")
     buckets = bucket_data(data, datetime.timedelta(minutes=15).seconds, ignore_date=True)
     stats = compute_statistics(buckets)
