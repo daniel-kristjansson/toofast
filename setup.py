@@ -54,6 +54,7 @@ setup(name='toofast',
     dependency_links=[
     ],
     scripts=[
+        "bin/speeders.py"
     ],
     package_data={ "toofast": [] },
     install_requires=get_requirements(),

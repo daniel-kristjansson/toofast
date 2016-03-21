@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 This program assumes a directory of CSV files with a peculiar format.
 
@@ -32,9 +32,9 @@ statistics on that data.
 import logging
 import datetime
 import sys
-from parse_input import read_data_directory
-from output_statistics import output_csv
-from analyse_data import (
+from toofast.parse_input import read_data_directory
+from toofast.output_statistics import output_csv
+from toofast.analyse_data import (
     bucket_data, compute_statistics, group_statistics)
 
 

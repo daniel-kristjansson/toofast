@@ -4,7 +4,7 @@ import logging
 import csv
 import os
 import timestring
-from constants import (
+from .constants import (
     FILE_HEADERS, VEHICLE_HEADERS, MINIMUM_SPEED, MAXIMUM_SPEED)
 
 
@@ -25,7 +25,7 @@ def extract_file_header(row):
     for header in FILE_HEADERS:
         for idx in xrange(len(row)):
             if row[idx] and header == row[idx][0:len(header)].lower():
-                return {header: row[idx+1]}
+                return {header: row[idx + 1]}
     return {}
 
 
@@ -90,8 +90,9 @@ def extract_data_row(file_header, header_info, row, line_num):
                 cur["timeofday"] = timestring.Date("1/1/2016" + " " + cur['time'])
                 data += [cur]
             elif not is_null_vehicle(cur):
-                logging.info("'{}':{:<4} Invalid vehicle {}".format(
-                    file_header["filename"], line_num, cur))
+                msg = "'{}':{:<4} Invalid vehicle {}".format(
+                    file_header["filename"], line_num, cur)
+                logging.info(msg)  # pylint wants me to use % but I want prettier printing
             cur = {}
     return data
 
