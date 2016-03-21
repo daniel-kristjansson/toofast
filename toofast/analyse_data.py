@@ -1,11 +1,12 @@
 """
 Analyse our speeding data
 """
+import math
 
 
-def bucket_data(data, block_duration, ignore_date=False):
+def bucket_data(data, block_duration):
     '''Buckets our data by time of day'''
-    timekey = "timeofday" if ignore_date else "datetime"
+    timekey = "datetime"
     datetimes = [val[timekey] for val in data]
     min_datetime = min(datetimes) + 0  # forces copy
     min_datetime.minute = 0
@@ -30,19 +31,19 @@ def compute_statistics(buckets):
         speeds = sorted([float(val["speed"]) for val in bucket["data"]])
         if not speeds:
             continue
-        speed_limit = bucket["data"][0]["speed limit"]
+        speed_limit = float(bucket["data"][0]["speed limit"])
         stats[bucket['name']] = {
             "limit": speed_limit,
-            "count_legal": len([spd for spd in speeds if spd <= float(speed_limit)]),
-            "%legal": 100.0 * len([spd for spd in speeds if spd <= float(speed_limit)]) / len(speeds),
+            "count_legal": len([spd for spd in speeds if spd <= speed_limit]),
+            "%legal": 100.0 * len([spd for spd in speeds if spd <= speed_limit]) / len(speeds),
             "min": float(speeds[0]),
             "max": float(speeds[-1]),
             "count": len(speeds),
-            "85%": float(speeds[int(len(speeds) * 0.85)]),
-            "99%": float(speeds[int(len(speeds) * 0.99)]),
+            "85%": float(speeds[int(math.floor(len(speeds) * 0.85))]),
+            "99%": float(speeds[int(math.floor(len(speeds) * 0.99))]),
             "diff": float(speeds[-1]) - float(speeds[0]),
             "mean": float(sum(speeds)) / len(speeds),
-            "50%": float(speeds[int(len(speeds) * 0.50)]),
+            "50%": float(speeds[int(math.floor(len(speeds) * 0.50))]),
         }
     return stats
 
