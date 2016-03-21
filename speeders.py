@@ -36,8 +36,13 @@ import os
 import sys
 import timestring
 
+# Headers for each CSV. Metadata about a particular set of times and location for a speed study.
 FILE_HEADERS = ["name", "date", "location", "direction", "weather", "speed limit"]
+# Headers for each vehicle column
 VEHICLE_HEADERS = ['vehicle', 'time', 'speed']
+# To avoid data entry errors spoiling our data, we filter out very slow or very fast vehicle data
+MINIMUM_SPEED = 10
+MAXIMUM_SPEED = 99
 
 def extract_file_header(row):
     '''
@@ -74,19 +79,21 @@ def read_file_header(filename, csv_reader):
     raise Exception("Unable to parse header for file {}".format(filename))
 
 def is_null_vehicle(cur):
+    '''Returns True if and only if we've seen a header or a empty vehicle entry'''
     for key, value in cur.iteritems():
         if not value or value.lower() == key:
             return True
     return False
 
 def is_valid_vehicle(cur):
+    '''Returns True if and only if we should treat this as a valid entry'''
     if is_null_vehicle(cur):
         return False
     if not cur.get("vehicle", "not integer").isdigit():
         return False
     if not cur.get("speed", "not integer").isdigit():
         return False
-    if float(cur.get("speed")) < 10:
+    if float(cur.get("speed")) < MINIMUM_SPEED or float(cur.get("speed")) > MAXIMUM_SPEED:
         return False
     return True
 
