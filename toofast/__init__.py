@@ -1,0 +1,1 @@
+'''Too Fast module'''
