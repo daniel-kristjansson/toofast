@@ -80,8 +80,9 @@ def count_speeds(speeds):
     '''
     speedbuckets = defaultdict(int)
     for speed in speeds:
-        speedbuckets[str(int(math.floor(speed / 5) * 5))] += 1
-    return speedbuckets
+        speedbuckets[int(math.floor(speed / 5) * 5)] += 1
+    return {"{}-{}".format(key, key + 5): value
+            for key, value in speedbuckets.iteritems()}
 
 
 def combine_stats(stats):

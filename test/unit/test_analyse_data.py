@@ -79,7 +79,7 @@ class AnalyseDataTests(TestCase):
         self.assertAlmostEqual(period1["limit"], 25)
 
     def test_count_speeds(self):
-        self.assertEqual(count_speeds([10, 10, 20]), {"10": 2, "20": 1})
+        self.assertEqual(count_speeds([10, 14.9, 20]), {"10-15": 2, "20-25": 1})
 
     def test_filter_statistics_no_min(self):
         self.assertEqual(filter_statistics("bart", 0), "bart")
