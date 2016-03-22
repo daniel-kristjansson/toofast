@@ -60,8 +60,7 @@ the problematic file.
 
 All logging is to stderr and all output to stdout.
 
-# Initial Requirements
-
+# Appendix
 ## Details on the input file format
 
 The format of the spreadsheed export CSV looks like this:
