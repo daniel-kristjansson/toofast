@@ -3,7 +3,7 @@ from unittest import TestCase
 from mock import MagicMock, patch
 import timestring
 from toofast.analyse_data import (
-    bucket_data, compute_statistics, group_statistics)
+    bucket_data, compute_statistics, group_statistics, filter_statistics, count_speeds)
 
 
 def mock_vehicle(speed, datetime=None):
@@ -81,3 +81,14 @@ class AnalyseDataTests(TestCase):
         self.assertAlmostEqual(period1["mean"], 25.0)
         self.assertAlmostEqual(period1["count"], 4)
         self.assertAlmostEqual(period1["limit"], 25)
+
+    def test_count_speeds(self):
+        self.assertEqual(count_speeds([10, 10, 20]), {"10": 2, "20": 1})
+
+    def test_filter_statistics_no_min(self):
+        self.assertEqual(filter_statistics("bart", 0), "bart")
+        self.assertEqual(filter_statistics("bart", None), "bart")
+
+    def test_filter_statistics_with_min(self):
+        self.assertEqual(filter_statistics({"A": {"count": 10}, "B": {"count": 1}}, 5),
+                         {"A": {"count": 10}})

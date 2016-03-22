@@ -2,6 +2,7 @@
 Analyse our speeding data
 """
 import math
+from collections import defaultdict
 
 
 def min_timekey(datetimes):
@@ -63,8 +64,24 @@ def compute_statistics(buckets):
             "diff": float(speeds[-1]) - float(speeds[0]),
             "mean": float(sum(speeds)) / len(speeds),
             "50%": float(speeds[int(math.floor(max_speed_index * 0.50))]),
+            "_speeds": speeds
         }
     return stats
+
+
+def count_speeds(speeds):
+    '''
+    Count the speeds in each 5 mph interval
+
+    Returns dictionary with string keys at 5 mph intervals containing
+    a count of values found between that value and 5 mph faster.
+
+    i.e. {"10": 2, "15": 5, "20": 2}
+    '''
+    speedbuckets = defaultdict(int)
+    for speed in speeds:
+        speedbuckets[str(int(math.floor(speed / 5) * 5))] += 1
+    return speedbuckets
 
 
 def combine_stats(stats):
@@ -74,6 +91,9 @@ def combine_stats(stats):
     inv_stat_cnt = 1.0 / len(stats)
     min_spd = min([stat["min"] for stat in stats])
     max_spd = max([stat["max"] for stat in stats])
+    speeds = []
+    for stat in stats:
+        speeds += stat["_speeds"]
     return {
         "limit": stats[0]["limit"],
         "count_legal": count_legal,
@@ -85,7 +105,8 @@ def combine_stats(stats):
         "99%": sum([stat["99%"] for stat in stats]) * inv_stat_cnt,
         "diff": max_spd - min_spd,
         "mean": sum([stat["mean"] for stat in stats]) * inv_stat_cnt,
-        "50%": sum([stat["50%"] for stat in stats]) * inv_stat_cnt
+        "50%": sum([stat["50%"] for stat in stats]) * inv_stat_cnt,
+        "_speeds": speeds
     }
 
 
@@ -103,11 +124,11 @@ def group_statistics(stats):
         str("{:02}:{:02}:00".format(when[0], when[1])):
         combine_stats(group_stats) for when, group_stats in tod_stat.iteritems()}
 
+
 def filter_statistics(stats, min_count):
     '''Filter out statistics that don't meet our criteria'''
     if min_count:
-        return { when: stat for when, stat in stats.iteritems()
-                 if stat["count"] > min_count }
+        return {when: stat for when, stat in stats.iteritems()
+                if stat["count"] > min_count}
     else:
         return stats
-
