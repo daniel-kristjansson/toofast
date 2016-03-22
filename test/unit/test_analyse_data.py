@@ -29,21 +29,21 @@ class AnalyseDataTests(TestCase):
             mock_vehicle(30, timestring.Date("1/1/2016 05:29:59"))]
         buckets = bucket_data(data, 15 * 60)
         self.assertEqual(len(buckets), 2)
-        bucket_a = [b for b in buckets if b["name"].tm_hour == 5 and b["name"].tm_min == 0][0]
-        self.assertEqual(len(bucket_a["data"]), 4)
-        self.assertEqual([val["speed"] for val in bucket_a["data"]], ["20", "20", "20", "20"])
+        bucket_a = [b for k, b in buckets.iteritems() if k.tm_hour == 5 and k.tm_min == 0][0]
+        self.assertEqual(len(bucket_a), 4)
+        self.assertEqual([val["speed"] for val in bucket_a], ["20", "20", "20", "20"])
 
     def test_compute_statistics(self):
-        buckets = [
-            {"data": [mock_vehicle(30), mock_vehicle(20)], "name": "1"},
-            {"data": [mock_vehicle(30), mock_vehicle(30)], "name": "2"},
-            {"data": [mock_vehicle(20), mock_vehicle(20)], "name": "3"},
-            {"data": [mock_vehicle(20), mock_vehicle(21),
-                      mock_vehicle(22), mock_vehicle(23),
-                      mock_vehicle(24), mock_vehicle(25),
-                      mock_vehicle(26), mock_vehicle(27),
-                      mock_vehicle(28), mock_vehicle(29)], "name": "4"},
-            {"data": [], "name": "5"}]
+        buckets = {
+            "1": [mock_vehicle(30), mock_vehicle(20)],
+            "2": [mock_vehicle(30), mock_vehicle(30)],
+            "3": [mock_vehicle(20), mock_vehicle(20)],
+            "4": [mock_vehicle(20), mock_vehicle(21),
+                  mock_vehicle(22), mock_vehicle(23),
+                  mock_vehicle(24), mock_vehicle(25),
+                  mock_vehicle(26), mock_vehicle(27),
+                  mock_vehicle(28), mock_vehicle(29)],
+            "5": []}
         stats = compute_statistics(buckets)
         self.assertAlmostEqual(stats["1"]["max"], 30.0)
         self.assertAlmostEqual(stats["3"]["max"], 20.0)
@@ -66,11 +66,11 @@ class AnalyseDataTests(TestCase):
         self.assertIsNone(stats.get("5"))
 
     def test_group_statistics(self):
-        buckets = [
-            {"data": [mock_vehicle(20), mock_vehicle(20)], "name": timestring.Date("2016-01-01 05:00:00")},
-            {"data": [mock_vehicle(20), mock_vehicle(20)], "name": timestring.Date("2016-01-01 05:15:00")},
-            {"data": [mock_vehicle(30), mock_vehicle(30)], "name": timestring.Date("2016-01-02 05:00:00")},
-            {"data": [mock_vehicle(25), mock_vehicle(25)], "name": timestring.Date("2016-01-01 05:15:00")}]
+        buckets = {
+            timestring.Date("2016-01-01 05:00:00").date.timetuple(): [mock_vehicle(20), mock_vehicle(20)],
+            timestring.Date("2016-01-01 05:15:00").date.timetuple(): [mock_vehicle(20), mock_vehicle(20)],
+            timestring.Date("2016-01-02 05:00:00").date.timetuple(): [mock_vehicle(30), mock_vehicle(30)],
+            timestring.Date("2016-01-01 05:15:00").date.timetuple(): [mock_vehicle(25), mock_vehicle(25)]}
         stats = compute_statistics(buckets)
         gstats = group_statistics(stats)
         period1 = gstats["05:00:00"]

@@ -20,7 +20,16 @@ def get_bucket_name(data_time, min_datetime, block_duration):
 
 
 def bucket_data(data, block_duration):
-    '''Buckets our data by time of day'''
+    '''
+    Buckets our data by time of day
+
+    This returns a dictionary where the key is a time.struct_time
+    corresponding to the begining of a bucket's time interval and
+    the value is a list of vehicles that fall in the bucket of
+    time starting at that time and ending before a block_duration
+    number of seconds have elapsed.
+
+    '''
     timekey = "datetime"
     min_datetime = min_timekey([val[timekey] for val in data])
     buckets = {}
@@ -30,19 +39,19 @@ def bucket_data(data, block_duration):
             buckets[name].append(vehicle)
         else:
             buckets[name] = [vehicle]
-    return [{"name": name, "data": bucket} for name, bucket in buckets.iteritems()]
+    return buckets
 
 
 def compute_statistics(buckets):
     '''Computes all the statistics we might want to know about a time series'''
     stats = {}
-    for bucket in buckets:
-        speeds = sorted([float(val["speed"]) for val in bucket["data"]])
+    for name, bucket in buckets.iteritems():
+        speeds = sorted([float(val["speed"]) for val in bucket])
         if not speeds:
             continue
-        speed_limit = float(bucket["data"][0]["speed limit"])
+        speed_limit = float(bucket[0]["speed limit"])
         max_speed_index = len(speeds) - 1
-        stats[bucket['name']] = {
+        stats[name] = {
             "limit": speed_limit,
             "count_legal": len([spd for spd in speeds if spd <= speed_limit]),
             "%legal": 100.0 * len([spd for spd in speeds if spd <= speed_limit]) / len(speeds),
