@@ -38,15 +38,35 @@ from toofast.analyse_data import (
     bucket_data, compute_statistics, group_statistics)
 
 
+def init_logging(level):
+    '''Initialize logging'''
+    logging.getLogger('').setLevel(level)
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logging.getLogger('').addHandler(handler)
+
+
 def main():
     '''Reads a directory of speed data and outputs relevant statistics'''
-    logging.getLogger('').setLevel(logging.DEBUG)
+    init_logging(logging.DEBUG)
 
+    logging.debug("reading in data")
     data = read_data_directory("sample_data")
+
+    logging.debug("bucketing data")
     buckets = bucket_data(data, datetime.timedelta(minutes=15).seconds)
+
+    logging.debug("computing statistics")
     stats = compute_statistics(buckets)
+
+    logging.debug("grouping statistics")
     grouped_stats = group_statistics(stats)
+
+    logging.debug("outputting statistics")
     output_csv(sys.stdout, grouped_stats)
+    logging.debug("done")
 
 
 if __name__ == "__main__":

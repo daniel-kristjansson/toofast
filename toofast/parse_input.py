@@ -1,5 +1,4 @@
 '''Handles Parsing of CSV Input'''
-
 import logging
 import csv
 import os
@@ -85,7 +84,7 @@ def extract_data_row(file_header, header_info, row, line_num):
             cur[header_info[idx]] = row[idx]
         if len(cur) == len(VEHICLE_HEADERS):
             if is_valid_vehicle(cur):
-                cur.update(file_header)
+                cur.update(file_header)  # Note: Verified this was not a significant slowdown
                 cur["datetime"] = timestring.Date(file_header['date'] + " " + cur['time'])
                 cur["timeofday"] = timestring.Date("1/1/2016" + " " + cur['time'])
                 data += [cur]

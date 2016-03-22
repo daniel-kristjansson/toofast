@@ -2,45 +2,56 @@
 Analyse our speeding data
 """
 import math
-import timestring
 
 
-def datetime_range(datetimes, block_duration):
-    '''Finds minumum and maximum times from a list'''
-    min_datetime = min(datetimes) + 0  # forces copy
+def min_timekey(datetimes):
+    '''Finds minumum times from a list'''
+    min_datetime = min(datetimes) + 0  # + 0 forces copy
     min_datetime.minute = 0
-    max_datetime = max(datetimes) + block_duration
-    return (min_datetime, max_datetime)
+    return min_datetime
+
+
+def get_bucket_name(data_time, min_datetime, block_duration):
+    '''Computes the bucket name based on the data point time'''
+    sec_diff = data_time.to_unixtime() - min_datetime.to_unixtime()
+    sec_diff = int(math.floor(sec_diff / block_duration)) * block_duration
+    date = min_datetime + sec_diff
+    return date.date.timetuple()
 
 
 def bucket_data(data, block_duration):
-    '''Buckets our data by time of day'''
-    timekey = "datetime"
-    min_datetime, max_datetime = datetime_range(
-        [val[timekey] for val in data], block_duration)
-    my_datetime = min_datetime
-    buckets = []
-    while my_datetime < max_datetime:
-        end_datetime = my_datetime + block_duration
-        bucket = [vehicle for vehicle in data
-                  if vehicle[timekey] >= my_datetime and vehicle[timekey] < end_datetime]
-        if bucket:
-            buckets.append({"name": my_datetime, "data": bucket})
-        my_datetime = end_datetime
+    '''
+    Buckets our data by time of day
 
+    This returns a dictionary where the key is a time.struct_time
+    corresponding to the begining of a bucket's time interval and
+    the value is a list of vehicles that fall in the bucket of
+    time starting at that time and ending before a block_duration
+    number of seconds have elapsed.
+
+    '''
+    timekey = "datetime"
+    min_datetime = min_timekey([val[timekey] for val in data])
+    buckets = {}
+    for vehicle in data:
+        name = get_bucket_name(vehicle[timekey], min_datetime, block_duration)
+        if buckets.get(name):
+            buckets[name].append(vehicle)
+        else:
+            buckets[name] = [vehicle]
     return buckets
 
 
 def compute_statistics(buckets):
     '''Computes all the statistics we might want to know about a time series'''
     stats = {}
-    for bucket in buckets:
-        speeds = sorted([float(val["speed"]) for val in bucket["data"]])
+    for name, bucket in buckets.iteritems():
+        speeds = sorted([float(val["speed"]) for val in bucket])
         if not speeds:
             continue
-        speed_limit = float(bucket["data"][0]["speed limit"])
+        speed_limit = float(bucket[0]["speed limit"])
         max_speed_index = len(speeds) - 1
-        stats[bucket['name']] = {
+        stats[name] = {
             "limit": speed_limit,
             "count_legal": len([spd for spd in speeds if spd <= speed_limit]),
             "%legal": 100.0 * len([spd for spd in speeds if spd <= speed_limit]) / len(speeds),
@@ -77,12 +88,13 @@ def combine_stats(stats):
         "50%": sum([stat["50%"] for stat in stats]) * inv_stat_cnt
     }
 
+
 def group_statistics(stats):
     '''Group our statistics by time of day'''
     # remap stats by time of day tuple (hour,minute)
     tod_stat = {}
     for when, stat in stats.iteritems():
-        tod = (when.hour, when.minute)
+        tod = (when.tm_hour, when.tm_min)
         if tod_stat.get(tod):
             tod_stat[tod].append(stat)
         else:
