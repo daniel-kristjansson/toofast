@@ -35,7 +35,7 @@ not for ease of parsing.
 * The effect of rain in MPH on speeding [NTH]
 
 ## A second detail report will compute: [NEW REQUIREMENT]
-* A breakdown of speeds in a particular 15 minute time period.
+* A breakdown of speeds in a particular 15 minute time period. [DONE]
 
 ## Output
 Should be a CSV for easy charting.
