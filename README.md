@@ -29,19 +29,19 @@ pip install -e .
 
 # How to use
 
-## To get basic help
+##### To get basic help
   speeders.py --help
 
-## To run a statistical analysis on some sample data and put it in a file
+##### To run a statistical analysis on some sample data and put it in a file
   speeders.py sample_data > my_cool_output.csv
 
-## To run a statistical analysis on some sample data with 30 minute intervals
+##### To run a statistical analysis on some sample data with 30 minute intervals
   speeders.py sample_data --interval 30
 
-## To get speed detail on some sample data
+##### To get speed detail on some sample data
   speeders.py sample_data --detail
 
-## Other options
+##### Other options
 
 You can also run with debugging or set the minimum number of
 samples in an interval before we compute statistics.
