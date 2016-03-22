@@ -29,7 +29,7 @@ class AnalyseDataTests(TestCase):
             mock_vehicle(30, timestring.Date("1/1/2016 05:29:59"))]
         buckets = bucket_data(data, 15 * 60)
         self.assertEqual(len(buckets), 2)
-        bucket_a = [b for b in buckets if b["name"] == timestring.Date("2016-01-01 05:00:00")][0]
+        bucket_a = [b for b in buckets if b["name"].tm_hour == 5 and b["name"].tm_min == 0][0]
         self.assertEqual(len(bucket_a["data"]), 4)
         self.assertEqual([val["speed"] for val in bucket_a["data"]], ["20", "20", "20", "20"])
 
@@ -81,4 +81,3 @@ class AnalyseDataTests(TestCase):
         self.assertAlmostEqual(period1["mean"], 25.0)
         self.assertAlmostEqual(period1["count"], 4)
         self.assertAlmostEqual(period1["limit"], 25)
-
