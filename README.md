@@ -1,12 +1,70 @@
 # Analyses Speed Study Data
 
+# Introduction
+
+This program was created to analyse the speed study data collected manually first on paper and
+then in a google spreadsheet [Sample Data](https://goo.gl/yvidBb).
+
+Consequently we needed to read in this data and found that
+exporting each sheet as a CSV was the simplest approach.
+
+This program reads a directory of files containing such CSV
+files and then outputs one of two types of reports.
+
+The first type is a statistics only report, and it provides
+the statistics people are concerned about when evaluating
+whether there is a speeding problem on a street that might
+need to be addressed.
+
+Various statistics tell us different things
+ * 99% data shows us when there should be enforcement.
+ * 85% data when more than 5 mph above the speed limit shows us that reengineering is called for.
+ * min and max show us if there is a large differential in speed
+ * diff is the actual difference between the min and max for convenience
+
+# How to install
+
+mkvirtualenv myenv
+pip install -e .
+
+# How to use
+
+## To get basic help
+  speeders.py --help
+
+## To run a statistical analysis on some sample data and put it in a file
+  speeders.py sample_data > my_cool_output.csv
+
+## To run a statistical analysis on some sample data with 30 minute intervals
+  speeders.py sample_data --interval 30
+
+## To get speed detail on some sample data
+  speeders.py sample_data --detail
+
+## Other options
+
+You can also run with debugging or set the minimum number of
+samples in an interval before we compute statistics.
+
+You can also combine the options above to get different reports.
+
+The output CSV can be consumed by various other utilities for graphics the data.
+
+## Notes
+
+Any vehicle data the program can't ingest results in a log line containing the file
+and problematic line of the file.
+
+Any header data the program can't ingest will exit the program and log the name of
+the problematic file.
+
+All logging is to stderr and all output to stdout.
+
 # Initial Requirements
 
-## Problem
-The speed study data I have is in a Google spreadsheet: [Sample Data](https://goo.gl/yvidBb)
-I can export each sheet as a CSV and then read that in as my input.
+## Details on the input file format
 
-The format of the spreadsheed export CSV looks something like this:
+The format of the spreadsheed export CSV looks like this:
 
 ```
 ,,,,,,,,,,,
@@ -26,21 +84,3 @@ The format of the spreadsheed export CSV looks something like this:
 
 This peculiar format comes from a sheet which is optimized for human input,
 not for ease of parsing.
-
-## The data to compute is:
-* The max, min, 99%, and 85% speed for each 15 minute time period. [DONE]
-* The convolution of the speeding data with the AAA injury and fatality tables [WON'T DO, too wonky for target audience]
-* The same data with outliers removed [NTH]
-* The same data with and without rain [NTH]
-* The effect of rain in MPH on speeding [NTH]
-
-## A second detail report will compute: [NEW REQUIREMENT]
-* A breakdown of speeds in a particular 15 minute time period. [DONE]
-
-## Output
-Should be a CSV for easy charting.
-
-## Other criteria:
-* All the rejected lines of the csv should be logged [DONE, sent to stderr]
-* It should be possible to specify a minimum number of data points before statistics are computed for a time period. [DONE]
-* The program should accept command line parameters to determine what to compute, so that if I need to change the time period or percentage I want to compute this can be done easily. [DONE, the interval was the only thing it really made sense to allow as a pass in]
