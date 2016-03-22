@@ -1,37 +1,32 @@
 #!/usr/bin/env python
 """
-This program assumes a directory of CSV files with a peculiar format.
+Imports speed study data and outputs a report based on that data.
 
-The format of the files is a set of lines called a header containing
-lines like this:
-,,,,,,,,,,,
-,Name[s],Daniel K & Julie T,,,,,,,,,
-,Date,8/10/2015,,,,,,,,,
-,Location,Rogers Ave & Midwood St,,,,,,,,,
-,Direction,North,,,,,,,,,
-,Weather,Sunny,,,,,,,,,
-,Speed Limit,25,,,,,,,,,
-,,,,,,,,,,,
+Usage:
+    speeders.py [--debug] --input INPUT_DIRECTORY [--interval INTERVAL] [--detail WHEN]
+    speeders.py (-h | --help)
 
-This header if followed by lines containing data which look like this:
-,Vehicle,Time,Speed,,Vehicle,Time,Speed,,Vehicle,Time,Speed
-,1,6:56,44,,1,7:16,38,,1,7:31,31
-,,,,,,,,,,,
-,Vehicle,Time,Speed,,Vehicle,Time,Speed,,Vehicle,Time,Speed
-,1,7:49,25,,1,8:05,29,,1,8:22,30
+Options:
+    -h --help   Show this screen
+    --debug     Log in debug level
+    --input     Directory containing input CSV files
+    --interval  Sampling interval [default: 15]
+    --detail    Request detailed report for a particular time of day
 
-This peculiar format comes from a sheet which is optimized for human input,
-not for ease of parsing.
+The default report is broken down into interval spaced time periods and
+data from all days in the input data is combined inteligently to produce
+the report.
 
-The job of this program to take this data and compute various statistics which
-are useful to show whether or not there is speeding on a particular road.
+If you request a detailed report and specify a valid time period then
+a breakdown of speeds recorded in that time period is produced instead
+of the default report.
 
-The program groups the data into 15 minute intervals and then computes
-statistics on that data.
+Output is in the form of a CSV file sent to the standard output.
 """
 import logging
 import datetime
 import sys
+from docopt import docopt
 from toofast.parse_input import read_data_directory
 from toofast.output_statistics import output_csv
 from toofast.analyse_data import (
@@ -50,22 +45,26 @@ def init_logging(level):
 
 def main():
     '''Reads a directory of speed data and outputs relevant statistics'''
-    init_logging(logging.DEBUG)
+    args = docopt(__doc__)
+    init_logging(logging.DEBUG if args["--debug"] else logging.INFO)
 
     logging.debug("reading in data")
-    data = read_data_directory("sample_data")
+    data = read_data_directory(args["INPUT_DIRECTORY"])
 
     logging.debug("bucketing data")
     buckets = bucket_data(data, datetime.timedelta(minutes=15).seconds)
 
-    logging.debug("computing statistics")
-    stats = compute_statistics(buckets)
+    if args["--detail"]:
+        print "--detail is not yet supported"
+        sys.exit(1)
+    else:
+        logging.debug("computing statistics")
+        stats = compute_statistics(buckets)
+        logging.debug("grouping statistics")
+        grouped_stats = group_statistics(stats)
+        logging.debug("outputting statistics")
+        output_csv(sys.stdout, grouped_stats)
 
-    logging.debug("grouping statistics")
-    grouped_stats = group_statistics(stats)
-
-    logging.debug("outputting statistics")
-    output_csv(sys.stdout, grouped_stats)
     logging.debug("done")
 
 

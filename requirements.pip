@@ -1,5 +1,6 @@
 # Place dependencies in this file, following the distutils format:
 # http://docs.python.org/2/distutils/setupscript.html#relationships-between-distributions-and-packages
-certifi==2016.2.28
-dateparser==0.3.4
+certifi>=2016.2.28
+dateparser>=0.3.4,<1
 python-dateutil>=2.4.0,<3
+docopt>=0.6.1,<1
