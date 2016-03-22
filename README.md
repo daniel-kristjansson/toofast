@@ -37,7 +37,8 @@ not for ease of parsing.
 ## A second detail report will compute: [NEW REQUIREMENT]
 * A breakdown of speeds in a particular 15 minute time period.
 
-## I want the output as a CSV (so I can chart the data).
+## Output
+Should be a CSV for easy charting.
 
 ## Other criteria:
 * All the rejected lines of the csv should be logged (the headers and notes, etc)
