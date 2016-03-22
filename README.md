@@ -30,9 +30,9 @@ not for ease of parsing.
 ## The data to compute is:
 * The max, min, 99%, and 85% speed for each 15 minute time period. [DONE]
 * The convolution of the speeding data with the AAA injury and fatality tables [WON'T DO, too wonky for target audience]
-* The same data with outliers removed [TODO]
-* The same data with and without rain [TODO]
-* The effect of rain in MPH on speeding [TODO]
+* The same data with outliers removed [NTH]
+* The same data with and without rain [NTH]
+* The effect of rain in MPH on speeding [NTH]
 
 ## A second detail report will compute: [NEW REQUIREMENT]
 * A breakdown of speeds in a particular 15 minute time period.
