@@ -42,5 +42,5 @@ Should be a CSV for easy charting.
 
 ## Other criteria:
 * All the rejected lines of the csv should be logged [DONE, sent to stderr]
-* It should be possible to specify a minimum number of data points before statistics are computed for a time period.
+* It should be possible to specify a minimum number of data points before statistics are computed for a time period. [DONE]
 * The program should accept command line parameters to determine what to compute, so that if I need to change the time period or percentage I want to compute this can be done easily. [DONE, the interval was the only thing it really made sense to allow as a pass in]

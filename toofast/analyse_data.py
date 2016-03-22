@@ -102,3 +102,12 @@ def group_statistics(stats):
     return {
         str("{:02}:{:02}:00".format(when[0], when[1])):
         combine_stats(group_stats) for when, group_stats in tod_stat.iteritems()}
+
+def filter_statistics(stats, min_count):
+    '''Filter out statistics that don't meet our criteria'''
+    if min_count:
+        return { when: stat for when, stat in stats.iteritems()
+                 if stat["count"] > min_count }
+    else:
+        return stats
+
