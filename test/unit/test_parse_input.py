@@ -15,10 +15,6 @@ from toofast.parse_input import (
 class ParseInputTests(TestCase):
     """Tests of CSV input parsing"""
 
-    def setUp(self):
-        """Pre-test setup"""
-        pass
-
     def test_extract_file_header_with_data(self):
         row = ["", "", "name[s]", "tester", "", ""]
         self.assertEqual(extract_file_header(row), {"name": "tester"})

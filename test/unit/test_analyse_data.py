@@ -13,10 +13,6 @@ def mock_vehicle(speed, datetime=None):
 class AnalyseDataTests(TestCase):
     """Tests analysis of data"""
 
-    def setUp(self):
-        """Pre-test setup"""
-        pass
-
     def test_bucket_data(self):
         data = [
             mock_vehicle(20, timestring.Date("1/1/2016 05:00:00")),
