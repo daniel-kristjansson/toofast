@@ -10,7 +10,7 @@ Options:
     -h --help   Show this screen
     --debug     Log in debug level
     --input     Directory containing input CSV files
-    --interval  Sampling interval [default: 15]
+    --interval  Sampling interval in minutes [default: 15]
     --detail    Request detailed report for a particular time of day
 
 The default report is broken down into interval spaced time periods and
@@ -52,7 +52,9 @@ def main():
     data = read_data_directory(args["INPUT_DIRECTORY"])
 
     logging.debug("bucketing data")
-    buckets = bucket_data(data, datetime.timedelta(minutes=15).seconds)
+    delta = datetime.timedelta(minutes=int(args["INTERVAL"] or 15)).seconds
+    print delta
+    buckets = bucket_data(data, delta)
 
     if args["--detail"]:
         print "--detail is not yet supported"
